@@ -11,7 +11,8 @@ class FileReader
      * @param string $path
      * @return \Generator
      */
-    public function read(string $path) : \Generator {
+    public function read(string $path) : \Generator
+    {
         $file = fopen($path, 'r');
         while(!feof($file)) {
             yield fgets($file);

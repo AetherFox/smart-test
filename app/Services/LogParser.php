@@ -11,7 +11,8 @@ class LogParser
      * @param \Generator $file
      * @return array
      */
-    public function parse(\Generator $file) : array {
+    public function parse(\Generator $file) : array
+    {
         $data = [];
         while($line = $file->current()) {
             $line = explode(' ', $line);
