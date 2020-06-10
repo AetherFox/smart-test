@@ -38,4 +38,4 @@ $ php artisan test
 - Add sorting and filtering options for output
 - Add additional data sources except for files (i.e. sockets)
 - Add different output options and formats (i.e. json)
-- Test command output, not only its code
+- Test command output, not only its exit code
