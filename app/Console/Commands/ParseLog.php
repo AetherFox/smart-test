@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Services\FileReader;
-use App\Services\LogParser;
 
 /**
  * @see $description
@@ -31,39 +30,15 @@ class ParseLog extends Command
     private $fileReader;
 
     /**
-     * @var LogParser
-     */
-    private $logParser;
-
-    /**
      * Create a new command instance.
      *
      * @return void
      */
     public function __construct(
-        FileReader $fileReader,
-        LogParser $logParser
+        FileReader $fileReader
     ) {
         parent::__construct();
         $this->fileReader = $fileReader;
-        $this->logParser = $logParser;
-    }
-
-    /**
-     * Sorts and reduces the array by given key
-     *
-     * @param array $data
-     * @param string $key
-     * @return array
-     */
-    private function sortReduceByKey(array $data, string $key) : array {
-        usort($data, function ($a, $b) use ($key) {
-            return $a[$key] < $b[$key];
-        });
-        array_walk($data, function (&$value) use ($key) {
-            $value = [$value['uri'], $value[$key]];
-        });
-        return $data;
     }
 
     /**
@@ -75,10 +50,11 @@ class ParseLog extends Command
     {
         try {
             $logfile = $this->argument('logfile');
-            $file = $this->fileReader->read($logfile);
-            $data = $this->logParser->parse($file);
-            $this->table(['URI', 'Visits'], $this->sortReduceByKey($data, 'visits'));
-            $this->table(['URI', 'Unique Visits'], $this->sortReduceByKey($data, 'uniqueVisits'));
+            $container = app();
+            /** @var \App\Services\LogParsers\LogParserInterface $parser */
+            foreach ($container->tagged('LogParsers') as $parser) {
+                $this->table($parser->getHeader(), $parser->parse($this->fileReader->read($logfile)));
+            }
         } catch (\Exception $e) {
             $this->error('Error: ' . $e->getMessage());
         }

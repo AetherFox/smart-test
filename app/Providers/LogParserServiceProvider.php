@@ -4,7 +4,8 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Support\DeferrableProvider;
-use App\Services\LogParser;
+use App\Services\LogParsers\Visits;
+use App\Services\LogParsers\UniqueVisits;
 
 /**
  * Register logparser service
@@ -18,7 +19,9 @@ class LogParserServiceProvider extends ServiceProvider implements DeferrableProv
      */
     public function register()
     {
-        $this->app->singleton(LogParser::class);
+        $this->app->singleton(Visits::class);
+        $this->app->singleton(UniqueVisits::class);
+        $this->app->tag([Visits::class, UniqueVisits::class], 'LogParsers');
     }
 
     /**
@@ -28,6 +31,6 @@ class LogParserServiceProvider extends ServiceProvider implements DeferrableProv
      */
     public function provides()
     {
-        return [LogParser::class];
+        return ['LogParsers'];
     }
 }
